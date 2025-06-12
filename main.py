@@ -1,58 +1,70 @@
 import streamlit as st
 import random
 
-# 🎨 페이지 구성
 st.set_page_config(
-    page_title="🎮 가위 ✌️ 바위 ✊ 보 🖐️ 게임!",
-    page_icon="🎲",
-    layout="centered",
-    initial_sidebar_state="auto"
+    page_title="👥 인원 수에 따른 게임 추천",
+    page_icon="🎉",
+    layout="centered"
 )
 
-st.markdown("<h1 style='text-align: center; color: #ff4b4b;'>🎮 가위 ✌️ 바위 ✊ 보 🖐️ 게임에 오신 걸 환영합니다!</h1>", unsafe_allow_html=True)
-st.markdown("---")
+st.markdown("<h1 style='text-align: center; color: #3b82f6;'>👥 인원 수로 게임 추천 🎲</h1>", unsafe_allow_html=True)
+st.markdown("## 몇 명이서 게임하나요?")
 
-# 📜 설명
-st.markdown("""
-<style>
-.big-font {
-    font-size:22px !important;
+# 인원 수 입력
+people = st.slider("👫 인원 수를 선택하세요", min_value=1, max_value=20, value=1)
+
+# 게임 리스트 (한국에서 인기 있거나 할 만한 게임 기준)
+games_by_people = {
+    "혼자 (1명)": [
+        "📱 모바일 게임: 쿠키런: 킹덤",
+        "🧩 퍼즐 게임: 2048",
+        "🎮 닌텐도 싱글 게임: 젤다의 전설",
+        "💡 스도쿠, 크로스워드 퍼즐",
+        "🎧 리듬 게임: Cytus, 디제이맥스",
+    ],
+    "소규모 (2~4명)": [
+        "🕵️ 마피아 게임",
+        "🃏 카드게임: 우노, 루미큐브",
+        "🎨 제시어 게임",
+        "🎭 몸으로 말해요",
+        "🍻 간단한 술게임 (눈치게임 등)",
+    ],
+    "중간 규모 (5~8명)": [
+        "🕵️ 확장형 마피아 게임",
+        "🎲 보드게임: 카탄, 다빈치 코드",
+        "🗣️ 팀 퀴즈 대결",
+        "📦 상자 속 물건 맞추기",
+        "🎤 노래방 게임",
+    ],
+    "대규모 (9명 이상)": [
+        "🎭 대규모 마피아 게임",
+        "📢 제시어 릴레이 게임",
+        "🎤 대형 노래방 파티",
+        "🏃‍♂️ 숨바꼭질, 술래잡기",
+        "🕹️ 온라인 배틀로얄 (배틀그라운드, 롤 등)",
+    ],
 }
-</style>
-<div class='big-font'>
-👋 당신은 컴퓨터와 가위 ✌️ 바위 ✊ 보 🖐️를 겨룰 수 있어요! <br><br>
-🧠 컴퓨터는 무작위로 선택하고, 당신이 선택한 결과에 따라 승부가 결정됩니다!<br><br>
-🎉 과연 승자는 누구일까요?
-</div>
-""", unsafe_allow_html=True)
 
-# 🎲 게임 옵션
-choices = ["✌️ 가위", "✊ 바위", "🖐️ 보"]
-user_choice = st.selectbox("👇 하나를 선택하세요!", choices)
+# 인원수에 따른 추천 리스트 결정
+if people == 1:
+    category = "혼자 (1명)"
+elif 2 <= people <= 4:
+    category = "소규모 (2~4명)"
+elif 5 <= people <= 8:
+    category = "중간 규모 (5~8명)"
+else:
+    category = "대규모 (9명 이상)"
 
-# 🔁 게임 로직
-def get_result(user, computer):
-    if user == computer:
-        return "🤝 무승부예요!"
-    elif (user == "✌️ 가위" and computer == "🖐️ 보") or \
-         (user == "✊ 바위" and computer == "✌️ 가위") or \
-         (user == "🖐️ 보" and computer == "✊ 바위"):
-        return "🎉 당신이 이겼어요! 🏆"
-    else:
-        return "😢 컴퓨터가 이겼어요... 다시 도전해보세요!"
+st.markdown(f"### 🏷️ 현재 인원 수: **{people}명** → **{category} 게임** 추천!")
 
-# ▶️ 버튼 클릭 시
-if st.button("⚔️ 대결 시작!"):
-    computer_choice = random.choice(choices)
-    st.markdown(f"🧑 당신의 선택: **{user_choice}**")
-    st.markdown(f"💻 컴퓨터의 선택: **{computer_choice}**")
-    
-    result = get_result(user_choice, computer_choice)
-    
-    # 결과 출력
-    st.markdown(f"<h2 style='text-align: center; color: #4CAF50;'>{result}</h2>", unsafe_allow_html=True)
-    st.balloons()
+# 게임 추천
+recommended_game = random.choice(games_by_people[category])
+st.success(f"🎯 추천 게임: {recommended_game}")
 
-# 🎨 하단 꾸미기
+# 버튼 클릭 시 다른 게임 추천
+if st.button("🔄 다른 게임 추천 받기"):
+    new_game = random.choice(games_by_people[category])
+    st.info(f"🎉 새로운 추천: {new_game}")
+
 st.markdown("---")
-st.markdown("<p style='text-align: center;'>✨ 즐거운 시간 보내세요! - Made with ❤️ by Streamlit</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>🇰🇷 한국에서 많이 하는 게임들로 추천해드려요!<br>즐거운 시간 보내세요! 😊</p>", unsafe_allow_html=True)
