@@ -1,70 +1,28 @@
 import streamlit as st
-import random
+import openai
 
-st.set_page_config(
-    page_title="👥 인원 수에 따른 게임 추천",
-    page_icon="🎉",
-    layout="centered"
-)
+# 🔑 OpenAI API 키 설정
+openai.api_key = "YOUR_OPENAI_API_KEY"
 
-st.markdown("<h1 style='text-align: center; color: #3b82f6;'>👥 인원 수로 게임 추천 🎲</h1>", unsafe_allow_html=True)
-st.markdown("## 몇 명이서 게임하나요?")
+# 🎨 앱 타이틀
+st.title("🎓 나에게 맞는 AI 진로는?")
+st.write("당신의 관심사와 성향을 알려주면, GPT가 AI 분야 진로를 추천해줄게요!")
 
-# 인원 수 입력
-people = st.slider("👫 인원 수를 선택하세요", min_value=1, max_value=20, value=1)
+# 💬 사용자 입력
+user_input = st.text_input("AI에 관심이 있다면, 어떤 활동을 좋아하나요? (예: 그림, 문제 해결, 사람과 대화 등)")
 
-# 게임 리스트 (한국에서 인기 있거나 할 만한 게임 기준)
-games_by_people = {
-    "혼자 (1명)": [
-        "📱 모바일 게임: 쿠키런: 킹덤",
-        "🧩 퍼즐 게임: 2048",
-        "🎮 닌텐도 싱글 게임: 젤다의 전설",
-        "💡 스도쿠, 크로스워드 퍼즐",
-        "🎧 리듬 게임: Cytus, 디제이맥스",
-    ],
-    "소규모 (2~4명)": [
-        "🕵️ 마피아 게임",
-        "🃏 카드게임: 우노, 루미큐브",
-        "🎨 제시어 게임",
-        "🎭 몸으로 말해요",
-        "🍻 간단한 술게임 (눈치게임 등)",
-    ],
-    "중간 규모 (5~8명)": [
-        "🕵️ 확장형 마피아 게임",
-        "🎲 보드게임: 카탄, 다빈치 코드",
-        "🗣️ 팀 퀴즈 대결",
-        "📦 상자 속 물건 맞추기",
-        "🎤 노래방 게임",
-    ],
-    "대규모 (9명 이상)": [
-        "🎭 대규모 마피아 게임",
-        "📢 제시어 릴레이 게임",
-        "🎤 대형 노래방 파티",
-        "🏃‍♂️ 숨바꼭질, 술래잡기",
-        "🕹️ 온라인 배틀로얄 (배틀그라운드, 롤 등)",
-    ],
-}
+# ▶ GPT로 응답 요청
+if user_input:
+    with st.spinner("AI가 당신에게 맞는 진로를 생각 중이에요..."):
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # 또는 gpt-4
+            messages=[
+                {"role": "system", "content": "너는 친절한 AI 진로 컨설턴트야."},
+                {"role": "user", "content": f"나는 {user_input} 같은 걸 좋아해. AI 진로 중 나한테 맞는 걸 추천해줘."}
+            ]
+        )
 
-# 인원수에 따른 추천 리스트 결정
-if people == 1:
-    category = "혼자 (1명)"
-elif 2 <= people <= 4:
-    category = "소규모 (2~4명)"
-elif 5 <= people <= 8:
-    category = "중간 규모 (5~8명)"
-else:
-    category = "대규모 (9명 이상)"
+        ai_reply = response.choices[0].message.content
+        st.success("✨ 추천 진로")
+        st.markdown(ai_reply)
 
-st.markdown(f"### 🏷️ 현재 인원 수: **{people}명** → **{category} 게임** 추천!")
-
-# 게임 추천
-recommended_game = random.choice(games_by_people[category])
-st.success(f"🎯 추천 게임: {recommended_game}")
-
-# 버튼 클릭 시 다른 게임 추천
-if st.button("🔄 다른 게임 추천 받기"):
-    new_game = random.choice(games_by_people[category])
-    st.info(f"🎉 새로운 추천: {new_game}")
-
-st.markdown("---")
-st.markdown("<p style='text-align: center;'>🇰🇷 한국에서 많이 하는 게임들로 추천해드려요!<br>즐거운 시간 보내세요! 😊</p>", unsafe_allow_html=True)
