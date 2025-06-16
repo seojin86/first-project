@@ -1,36 +1,28 @@
 import streamlit as st
-from hanspell import spell_checker
 
-st.set_page_config(page_title="맞춤법 검사기 + 글자 수 세기", page_icon="📝")
+# 게임 추천 데이터 (샘플)
+games = [
+    {"name": "마피아", "min": 5, "max": 15, "type": "심리", "time": "30분 이상"},
+    {"name": "저글링 챌린지", "min": 2, "max": 4, "type": "활동", "time": "10~20분"},
+    {"name": "캐치마인드", "min": 3, "max": 8, "type": "그림", "time": "20~30분"},
+    {"name": "우노", "min": 2, "max": 10, "type": "카드", "time": "10~30분"},
+    {"name": "코드네임", "min": 4, "max": 8, "type": "단어", "time": "15~25분"},
+]
 
-st.title("📝 맞춤법 검사기 + 글자 수 세기")
-st.write("텍스트를 입력하면 맞춤법을 검사하고 글자 수를 알려드립니다.")
+st.title("인원수에 맞는 게임 추천기 🎲")
 
-# 사용자 입력
-text = st.text_area("검사할 문장을 입력하세요:", height=200)
+# 사용자 인원수 입력
+num_players = st.slider("몇 명이 참가하나요?", 2, 20)
 
-if text:
-    # 글자 수 계산
-    total_chars = len(text)
-    chars_no_space = len(text.replace(" ", ""))
-    st.write(f"🔤 총 글자 수 (띄어쓰기 포함): {total_chars}")
-    st.write(f"🔤 총 글자 수 (띄어쓰기 제외): {chars_no_space}")
+# 필터링된 게임 리스트
+recommended = [g for g in games if g["min"] <= num_players <= g["max"]]
 
-    if st.button("맞춤법 검사하기"):
-        with st.spinner("맞춤법 검사 중..."):
-            result = spell_checker.check(text)
-
-        corrected_text = result.checked
-        errors = result.errors
-
-        st.subheader("✅ 교정된 문장")
-        st.write(corrected_text)
-
-        if errors:
-            st.subheader("❗ 맞춤법 오류 목록")
-            for err in errors:
-                st.write(f"- `{err['token']}` → `{err['suggestion']}` ({err['info']})")
-        else:
-            st.success("맞춤법 오류가 없습니다.")
+if recommended:
+    st.subheader(f"추천 게임 리스트 ({len(recommended)}개)")
+    for game in recommended:
+        st.markdown(f"**{game['name']}**  \n"
+                    f"▶️ 유형: {game['type']} / ⏱️ 소요시간: {game['time']}")
+else:
+    st.warning("해당 인원수에 맞는 게임이 없습니다.")
 
 
